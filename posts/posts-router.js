@@ -113,6 +113,33 @@ function isValidComment(comment) {
   return text;
 }
 
-router.put();
+router.put("/:id", (req, res) => {
+  const id = req.params.id;
+  const { title, contents } = req.body;
+
+  if (title || contents) {
+    db.update(id, req.body)
+      .then(numPostUpdated => {
+        if (numPostUpdated) {
+          res
+            .status(200)
+            .json({ okay: "post updated successfully", numPostUpdated });
+        } else {
+          res.status(404).json({
+            message: "The post with the specified ID does not exist."
+          });
+        }
+      })
+      .catch(error => {
+        res.status(500).json({
+          error: "The post information could not be modified."
+        });
+      });
+  } else {
+    res
+      .status(400)
+      .json({ errorMessage: "Please provide text for the comment." });
+  }
+});
 
 module.exports = router;
